@@ -1,0 +1,15 @@
+1.No cupcakes can span before x seconds into the game
+
+2.Ajuster la plage de vitesse avec le temps écoulée depuis le début de la partie
+
+3.Ajuster la fluidité des mouvements droit/gauche du joueur and ammo??? https://stackoverflow.com/questions/14448981/remove-keydown-delay-in-javascript
+
+4.Mouvement up/down du joueur???
+
+5.More than one bullet on the board???
+
+6.activateSuperKillMode() and terminateSuperKillMode() should be in the SuperKillMode class
+
+7.Start bug where entities don't start at the top
+
+8.When you catch a rainbow, all enemies flash before dissapearing

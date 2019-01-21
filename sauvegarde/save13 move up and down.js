@@ -21,12 +21,6 @@ const CUPCAKE_MARGIN = (ENEMY_WIDTH - CUPCAKE_WIDTH) / 2;
 const RAINBOW_WIDTH = 75;
 const RAINBOW_HEIGHT = 75;
 
-const SPLASH_WIDTH = 75;
-const SPLASH_HEIGHT = 75;
-const SPLASH_MARGIN = (ENEMY_WIDTH - SPLASH_WIDTH) / 2;
-const SPLASH_LEFT = "left";
-const SPLASH_RIGHT = "right";
-
 const PLAYER_WIDTH = 75;
 const PLAYER_HEIGHT = 114;
 const START_PLAYER_WIDTH = 200;
@@ -65,7 +59,7 @@ let imageFilenames = [
   "background.png",
   "player.png",
   "ammo.png",
-  "splash.png",
+  "",
   "bullet.png",
   "cupcake.png",
   "cupcake_40.png",
@@ -151,7 +145,7 @@ class Bullet extends Entity {
       xPos + PLAYER_WIDTH / 2 - 5,
       yPos - (PLAYER_HEIGHT - PLAYER_OFFSET) / 2,
       "images/" + imageFilenames[5],
-      0.75,
+      1,
       BULLET_WIDTH,
       BULLET_HEIGHT
     );
@@ -203,10 +197,12 @@ class Player extends Entity {
 
   updateAmmo(nb) {
     this.nbAmmo = this.nbAmmo + nb;
+    //console.log(this.nbAmmo);
   }
 
   updateCupcake(nb) {
     this.nbCupcake = this.nbCupcake + nb;
+    //console.log(this.nbAmmo);
   }
 }
 
@@ -352,9 +348,6 @@ class Engine {
     this.isSuperKillMode = false;
     this.superKill = undefined;
 
-    // Setup splash
-    this.splash = undefined;
-
     //Background music
     this.musicMain = new Audio("sounds/bg_music.mp3");
 
@@ -483,26 +476,6 @@ class Engine {
           );
         }
         break;
-      //New splash right
-      case 14:
-        console.log("right splash create");
-        this.splash = new Splash(
-          this.root,
-          0,
-          Math.floor(Math.random() * 3 + 7) * ENEMY_HEIGHT,
-          SPLASH_RIGHT
-        );
-        break;
-      //New splash left
-      case 14:
-        console.log("left splash create");
-        this.splash = new Splash(
-          this.root,
-          GAME_WIDTH - SPLASH_WIDTH,
-          Math.floor(Math.random() * 3 + 7) * ENEMY_HEIGHT,
-          SPLASH_LEFT
-        );
-        break;
       //New rainbow
       case 15:
         this.entities[entitySpot] = new Rainbow(
@@ -523,7 +496,7 @@ class Engine {
   fireABullet() {
     if (this.player.nbAmmo > 0) {
       this.bullets.push(new Bullet(this.root, this.player.x, this.player.y));
-      this.player.updateAmmo(-1);
+      this.player.nbAmmo--;
     }
   }
 
@@ -623,15 +596,6 @@ class Engine {
     };
     renderBullet = renderBullet.bind(this);
     this.bullets.forEach(renderBullet);
-    // draw the splash
-    if (this.splash !== undefined) {
-      this.splash.render(this.ctx);
-    }
-
-    // Call update on splash
-    if (this.splash !== undefined) {
-      this.splash.update(timeDiff);
-    }
 
     // Check if any entity should die
     this.entities.forEach((entity, entityIdx) => {
@@ -649,22 +613,6 @@ class Engine {
         delete this.entities[bulletIdx];
       }
     });
-
-    // Check if splash should die
-    if (this.splash !== undefined) {
-      if (this.splash.direction === SPLASH_LEFT && this.splash.x < 0) {
-        console.log("Left splahs should die");
-        this.splash.destroy();
-        delete this.splash;
-      } else if (
-        this.splash.direction === SPLASH_RIGHT &&
-        this.splash.x > GAME_WIDTH
-      ) {
-        console.log("Right splahs should die");
-        this.splash.destroy();
-        delete this.splash;
-      }
-    }
 
     //Check if player collided with ammo
     this.isPlayerCollidedWithAmmo();
@@ -684,9 +632,8 @@ class Engine {
       this.musicMain.pause();
       this.musicMain.currentTime = 0;
     } else {
-      // If player is not dead, then draw the score and the ammo
+      // If player is not dead, then draw the score
       this.infoScore.update("SCORE " + Math.floor(this.score));
-      this.infoAmmo.update("AMMO " + this.player.nbAmmo);
 
       // Set the time marker and redraw
       this.lastFrame = Date.now();
@@ -744,6 +691,7 @@ class Engine {
         this.entities[i].destroy();
         delete this.entities[i];
         this.player.updateAmmo(5);
+        this.infoAmmo.update("AMMO " + this.player.nbAmmo);
         return true;
       }
     }
@@ -784,7 +732,7 @@ class Engine {
         delete this.entities[i];
         this.player.updateCupcake(1);
         this.divCupcake.style.width = this.player.nbCupcake * 40 + "px";
-        if (this.player.nbCupcake === NB_CUPCAKE_TO_SUPER_KILL) {
+        if (this.player.nbCupcake === NB_CUPCAKE_TO_SUPER_KILL - 1) {
           this.activateSuperKillMode();
         }
         return true;

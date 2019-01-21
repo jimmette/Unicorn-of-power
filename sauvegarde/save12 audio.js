@@ -1,6 +1,6 @@
 // This sectin contains some game constants. It is not super interesting
 const GAME_WIDTH = 450;
-const GAME_HEIGHT = 750;
+const GAME_HEIGHT = 700;
 const TITLE_BOX = 150;
 
 const ENEMY_WIDTH = 75;
@@ -21,12 +21,6 @@ const CUPCAKE_MARGIN = (ENEMY_WIDTH - CUPCAKE_WIDTH) / 2;
 const RAINBOW_WIDTH = 75;
 const RAINBOW_HEIGHT = 75;
 
-const SPLASH_WIDTH = 75;
-const SPLASH_HEIGHT = 75;
-const SPLASH_MARGIN = (ENEMY_WIDTH - SPLASH_WIDTH) / 2;
-const SPLASH_LEFT = "left";
-const SPLASH_RIGHT = "right";
-
 const PLAYER_WIDTH = 75;
 const PLAYER_HEIGHT = 114;
 const START_PLAYER_WIDTH = 200;
@@ -37,8 +31,6 @@ const PLAYER_OFFSET = 24;
 // These two constants keep us from using "magic numbers" in our code
 const LEFT_ARROW_CODE = 37;
 const RIGHT_ARROW_CODE = 39;
-const UP_ARROW_CODE = 38;
-const DOWN_ARROW_CODE = 40;
 const BULLET_CODE = 32;
 const GAME_START = 83;
 
@@ -51,8 +43,6 @@ const TIME_GAME_START = 1000;
 // These two constants allow us to DRY
 const MOVE_LEFT = "left";
 const MOVE_RIGHT = "right";
-const MOVE_UP = "up";
-const MOVE_DOWN = "down";
 
 const BACKGROUND_COLOR = "#F6CFCA";
 const BACKGROUND_TITLE_COLOR = "#EABFB9";
@@ -65,7 +55,7 @@ let imageFilenames = [
   "background.png",
   "player.png",
   "ammo.png",
-  "splash.png",
+  "",
   "bullet.png",
   "cupcake.png",
   "cupcake_40.png",
@@ -149,9 +139,9 @@ class Bullet extends Entity {
     super(
       root,
       xPos + PLAYER_WIDTH / 2 - 5,
-      yPos - (PLAYER_HEIGHT - PLAYER_OFFSET) / 2,
+      yPos - PLAYER_HEIGHT / 2,
       "images/" + imageFilenames[5],
-      0.75,
+      1,
       BULLET_WIDTH,
       BULLET_HEIGHT
     );
@@ -191,22 +181,17 @@ class Player extends Entity {
       this.x = this.x - PLAYER_MOVE;
     } else if (direction === MOVE_RIGHT && this.x < GAME_WIDTH - PLAYER_WIDTH) {
       this.x = this.x + PLAYER_MOVE;
-    } else if (direction === MOVE_UP && this.y > TITLE_BOX + PLAYER_OFFSET) {
-      this.y = this.y - PLAYER_MOVE;
-    } else if (
-      direction === MOVE_DOWN &&
-      this.y < GAME_HEIGHT - PLAYER_HEIGHT + PLAYER_OFFSET
-    ) {
-      this.y = this.y + PLAYER_MOVE;
     }
   }
 
   updateAmmo(nb) {
     this.nbAmmo = this.nbAmmo + nb;
+    //console.log(this.nbAmmo);
   }
 
   updateCupcake(nb) {
     this.nbCupcake = this.nbCupcake + nb;
+    //console.log(this.nbAmmo);
   }
 }
 
@@ -253,7 +238,7 @@ class Rainbow extends Entity {
  *
  */
 class Cupcake extends Entity {
-  constructor(root, xPos) {
+  constructor(root, xPos, yPos) {
     super(
       root,
       xPos,
@@ -266,33 +251,6 @@ class Cupcake extends Entity {
     );
 
     this.img.style.zIndex = 5;
-  }
-}
-
-class Splash extends Entity {
-  constructor(root, xPos, yPos, direction) {
-    super(
-      root,
-      xPos,
-      yPos,
-      "images/" + imageFilenames[4],
-      Math.random() / 2 + 0.25,
-      SPLASH_WIDTH,
-      SPLASH_HEIGHT,
-      SPLASH_MARGIN
-    );
-
-    this.direction = direction;
-
-    this.img.style.zIndex = 5;
-  }
-
-  update(timeDiff) {
-    if (this.direction === SPLASH_LEFT) {
-      this.x = this.x - timeDiff * this.speed;
-    } else if (this.direction === SPLASH_RIGHT) {
-      this.x = this.x + timeDiff * this.speed;
-    }
   }
 }
 
@@ -339,6 +297,8 @@ class Engine {
     this.root = element;
 
     this.isGameStarted = false;
+    this.isSuperKillMode = false;
+    this.superKill = undefined;
     this.nbMaxEntities = MAX_ENTITIES;
     this.startTime = 0;
 
@@ -348,20 +308,15 @@ class Engine {
     // Setup bullets array
     this.bullets = [];
 
-    // Setup super kill
-    this.isSuperKillMode = false;
-    this.superKill = undefined;
-
-    // Setup splash
-    this.splash = undefined;
-
     //Background music
+
+    //this.musicIntro = new Audio("sounds/intro_music.mp3");
     this.musicMain = new Audio("sounds/bg_music.mp3");
 
     // Setup the player
     this.player = new Player(this.root);
     // Setup enemies, making sure there are always three
-    //this.setupEntities();
+    this.setupEntities();
 
     //Setup body
     let body = document.querySelector("body");
@@ -483,26 +438,6 @@ class Engine {
           );
         }
         break;
-      //New splash right
-      case 14:
-        console.log("right splash create");
-        this.splash = new Splash(
-          this.root,
-          0,
-          Math.floor(Math.random() * 3 + 7) * ENEMY_HEIGHT,
-          SPLASH_RIGHT
-        );
-        break;
-      //New splash left
-      case 14:
-        console.log("left splash create");
-        this.splash = new Splash(
-          this.root,
-          GAME_WIDTH - SPLASH_WIDTH,
-          Math.floor(Math.random() * 3 + 7) * ENEMY_HEIGHT,
-          SPLASH_LEFT
-        );
-        break;
       //New rainbow
       case 15:
         this.entities[entitySpot] = new Rainbow(
@@ -523,7 +458,7 @@ class Engine {
   fireABullet() {
     if (this.player.nbAmmo > 0) {
       this.bullets.push(new Bullet(this.root, this.player.x, this.player.y));
-      this.player.updateAmmo(-1);
+      this.player.nbAmmo--;
     }
   }
 
@@ -553,10 +488,6 @@ class Engine {
         this.player.move(MOVE_LEFT);
       } else if (e.keyCode === RIGHT_ARROW_CODE) {
         this.player.move(MOVE_RIGHT);
-      } else if (e.keyCode === UP_ARROW_CODE) {
-        this.player.move(MOVE_UP);
-      } else if (e.keyCode === DOWN_ARROW_CODE) {
-        this.player.move(MOVE_DOWN);
       } else if (e.keyCode === BULLET_CODE) {
         this.fireABullet();
       } else if (e.keyCode === GAME_START) {
@@ -608,30 +539,19 @@ class Engine {
       });
     }
 
-    /**** Draw everything! ****/
-    // draw the entities
+    // Draw everything!
     let renderEntity = function(entity) {
       entity.render(this.ctx);
     };
     renderEntity = renderEntity.bind(this);
-    this.entities.forEach(renderEntity);
-    // draw the player
-    this.player.render(this.ctx);
-    // draw the entities
+    this.entities.forEach(renderEntity); // draw the entities
+    this.player.render(this.ctx); // draw the player
+
     let renderBullet = function(bullet) {
       bullet.render(this.ctx);
     };
     renderBullet = renderBullet.bind(this);
-    this.bullets.forEach(renderBullet);
-    // draw the splash
-    if (this.splash !== undefined) {
-      this.splash.render(this.ctx);
-    }
-
-    // Call update on splash
-    if (this.splash !== undefined) {
-      this.splash.update(timeDiff);
-    }
+    this.bullets.forEach(renderBullet); // draw the entities
 
     // Check if any entity should die
     this.entities.forEach((entity, entityIdx) => {
@@ -649,31 +569,38 @@ class Engine {
         delete this.entities[bulletIdx];
       }
     });
-
-    // Check if splash should die
-    if (this.splash !== undefined) {
-      if (this.splash.direction === SPLASH_LEFT && this.splash.x < 0) {
-        console.log("Left splahs should die");
-        this.splash.destroy();
-        delete this.splash;
-      } else if (
-        this.splash.direction === SPLASH_RIGHT &&
-        this.splash.x > GAME_WIDTH
-      ) {
-        console.log("Right splahs should die");
-        this.splash.destroy();
-        delete this.splash;
-      }
-    }
+    this.setupEntities();
 
     //Check if player collided with ammo
-    this.isPlayerCollidedWithAmmo();
-    //Check if a bullet collided with an enemy
+    if (this.isPlayerCollidedWithAmmo()) {
+      this.player.updateAmmo(5);
+    }
+    this.infoAmmo.update("AMMO " + this.player.nbAmmo);
+
     this.isBulletCollidedWithEnemy();
+
     //Check if player collided with cupcake
-    this.isPlayerCollidedWithCupcake();
+    if (this.isPlayerCollidedWithCupcake()) {
+      if (this.player.nbCupcake === NB_CUPCAKE_TO_SUPER_KILL - 1) {
+        this.activateSuperKillMode();
+      }
+      this.player.updateCupcake(1);
+      this.divCupcake.style.width = this.player.nbCupcake * 40 + "px";
+    }
+
     //Check if player collided with rainbow
-    this.isPlayerCollidedWithRainbow();
+    if (this.isPlayerCollidedWithRainbow()) {
+      //Every ennemies should die
+      for (let i = 0; i < this.entities.length; i++) {
+        if (
+          this.entities[i] !== undefined &&
+          this.entities[i] instanceof Enemy
+        ) {
+          this.entities[i].destroy();
+          delete this.entities[i];
+        }
+      }
+    }
 
     if (this.isPlayerDead()) {
       // Check if player is dead
@@ -684,9 +611,8 @@ class Engine {
       this.musicMain.pause();
       this.musicMain.currentTime = 0;
     } else {
-      // If player is not dead, then draw the score and the ammo
+      // If player is not dead, then draw the score
       this.infoScore.update("SCORE " + Math.floor(this.score));
-      this.infoAmmo.update("AMMO " + this.player.nbAmmo);
 
       // Set the time marker and redraw
       this.lastFrame = Date.now();
@@ -743,7 +669,6 @@ class Engine {
       ) {
         this.entities[i].destroy();
         delete this.entities[i];
-        this.player.updateAmmo(5);
         return true;
       }
     }
@@ -758,16 +683,6 @@ class Engine {
       ) {
         this.entities[i].destroy();
         delete this.entities[i];
-        //Every ennemies should die
-        for (let j = 0; j < this.entities.length; j++) {
-          if (
-            this.entities[j] !== undefined &&
-            this.entities[j] instanceof Enemy
-          ) {
-            this.entities[j].destroy();
-            delete this.entities[j];
-          }
-        }
         return true;
       }
     }
@@ -782,11 +697,6 @@ class Engine {
       ) {
         this.entities[i].destroy();
         delete this.entities[i];
-        this.player.updateCupcake(1);
-        this.divCupcake.style.width = this.player.nbCupcake * 40 + "px";
-        if (this.player.nbCupcake === NB_CUPCAKE_TO_SUPER_KILL) {
-          this.activateSuperKillMode();
-        }
         return true;
       }
     }

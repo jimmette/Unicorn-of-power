@@ -21,12 +21,6 @@ const CUPCAKE_MARGIN = (ENEMY_WIDTH - CUPCAKE_WIDTH) / 2;
 const RAINBOW_WIDTH = 75;
 const RAINBOW_HEIGHT = 75;
 
-const SPLASH_WIDTH = 75;
-const SPLASH_HEIGHT = 75;
-const SPLASH_MARGIN = (ENEMY_WIDTH - SPLASH_WIDTH) / 2;
-const SPLASH_LEFT = "left";
-const SPLASH_RIGHT = "right";
-
 const PLAYER_WIDTH = 75;
 const PLAYER_HEIGHT = 114;
 const START_PLAYER_WIDTH = 200;
@@ -65,7 +59,7 @@ let imageFilenames = [
   "background.png",
   "player.png",
   "ammo.png",
-  "splash.png",
+  "",
   "bullet.png",
   "cupcake.png",
   "cupcake_40.png",
@@ -151,7 +145,7 @@ class Bullet extends Entity {
       xPos + PLAYER_WIDTH / 2 - 5,
       yPos - (PLAYER_HEIGHT - PLAYER_OFFSET) / 2,
       "images/" + imageFilenames[5],
-      0.75,
+      1,
       BULLET_WIDTH,
       BULLET_HEIGHT
     );
@@ -352,9 +346,6 @@ class Engine {
     this.isSuperKillMode = false;
     this.superKill = undefined;
 
-    // Setup splash
-    this.splash = undefined;
-
     //Background music
     this.musicMain = new Audio("sounds/bg_music.mp3");
 
@@ -483,26 +474,6 @@ class Engine {
           );
         }
         break;
-      //New splash right
-      case 14:
-        console.log("right splash create");
-        this.splash = new Splash(
-          this.root,
-          0,
-          Math.floor(Math.random() * 3 + 7) * ENEMY_HEIGHT,
-          SPLASH_RIGHT
-        );
-        break;
-      //New splash left
-      case 14:
-        console.log("left splash create");
-        this.splash = new Splash(
-          this.root,
-          GAME_WIDTH - SPLASH_WIDTH,
-          Math.floor(Math.random() * 3 + 7) * ENEMY_HEIGHT,
-          SPLASH_LEFT
-        );
-        break;
       //New rainbow
       case 15:
         this.entities[entitySpot] = new Rainbow(
@@ -623,15 +594,6 @@ class Engine {
     };
     renderBullet = renderBullet.bind(this);
     this.bullets.forEach(renderBullet);
-    // draw the splash
-    if (this.splash !== undefined) {
-      this.splash.render(this.ctx);
-    }
-
-    // Call update on splash
-    if (this.splash !== undefined) {
-      this.splash.update(timeDiff);
-    }
 
     // Check if any entity should die
     this.entities.forEach((entity, entityIdx) => {
@@ -649,22 +611,6 @@ class Engine {
         delete this.entities[bulletIdx];
       }
     });
-
-    // Check if splash should die
-    if (this.splash !== undefined) {
-      if (this.splash.direction === SPLASH_LEFT && this.splash.x < 0) {
-        console.log("Left splahs should die");
-        this.splash.destroy();
-        delete this.splash;
-      } else if (
-        this.splash.direction === SPLASH_RIGHT &&
-        this.splash.x > GAME_WIDTH
-      ) {
-        console.log("Right splahs should die");
-        this.splash.destroy();
-        delete this.splash;
-      }
-    }
 
     //Check if player collided with ammo
     this.isPlayerCollidedWithAmmo();
