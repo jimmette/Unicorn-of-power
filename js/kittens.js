@@ -21,6 +21,12 @@ const CUPCAKE_MARGIN = (ENEMY_WIDTH - CUPCAKE_WIDTH) / 2;
 const RAINBOW_WIDTH = 75;
 const RAINBOW_HEIGHT = 75;
 
+const SPLASH_WIDTH = 75;
+const SPLASH_HEIGHT = 75;
+const SPLASH_MARGIN = (ENEMY_WIDTH - SPLASH_WIDTH) / 2;
+const SPLASH_LEFT = "left";
+const SPLASH_RIGHT = "right";
+
 const PLAYER_WIDTH = 75;
 const PLAYER_HEIGHT = 114;
 const START_PLAYER_WIDTH = 200;
@@ -145,7 +151,7 @@ class Bullet extends Entity {
       xPos + PLAYER_WIDTH / 2 - 5,
       yPos - (PLAYER_HEIGHT - PLAYER_OFFSET) / 2,
       "images/" + imageFilenames[5],
-      1,
+      0.75,
       BULLET_WIDTH,
       BULLET_HEIGHT
     );
@@ -260,33 +266,6 @@ class Cupcake extends Entity {
     );
 
     this.img.style.zIndex = 5;
-  }
-}
-
-class Splash extends Entity {
-  constructor(root, xPos, yPos, direction) {
-    super(
-      root,
-      xPos,
-      yPos,
-      "images/" + imageFilenames[4],
-      Math.random() / 2 + 0.25,
-      SPLASH_WIDTH,
-      SPLASH_HEIGHT,
-      SPLASH_MARGIN
-    );
-
-    this.direction = direction;
-
-    this.img.style.zIndex = 5;
-  }
-
-  update(timeDiff) {
-    if (this.direction === SPLASH_LEFT) {
-      this.x = this.x - timeDiff * this.speed;
-    } else if (this.direction === SPLASH_RIGHT) {
-      this.x = this.x + timeDiff * this.speed;
-    }
   }
 }
 
