@@ -10,6 +10,6 @@ Arrows to move
 
 ### Play
 
-wide-eyed-loss.surge.sh
+[wide-eyed-loss.surge.sh](wide-eyed-loss.surge.sh)
 
 Have fun!!!
