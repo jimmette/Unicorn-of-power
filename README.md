@@ -4,9 +4,11 @@
 
 ### Commands
 
-S - to start
-Spacebar - to shoot
-Arrows to move
+###### S - to start
+
+###### Spacebar - to shoot
+
+###### Arrows to move
 
 ### Play
 
