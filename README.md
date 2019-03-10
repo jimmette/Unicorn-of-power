@@ -2,6 +2,8 @@
 
 ## Javascript canvas game
 
+This is the first game I have coded. I wanted it filled with things that bring me joy et make me smile. Being a girly girl, it had to have unicorns and rainbows. Sadly, I could not find the right unicorn image, so, enjoy Rainbowdash instead!
+
 ### Commands
 
 - S - to start
@@ -12,7 +14,7 @@
 
 Get ammo <img src="./images/ammo.png"> and start shooting thunder clouds <img src="./images/enemy.png"> :)
 
-You need to collect 3 cupcakes <img src="./images/cupcake.png" align="middle"> to activate Super Kill Mode where you become invincible with infinit ammo for 10 seconds.
+You need to collect 3 cupcakes <img src="./images/cupcake.png"> to activate Super Kill Mode where you become invincible with infinit ammo for 10 seconds.
 
 Rainbows <img src="./images/rainbow.png"> kill all thunder clouds on the map.
 
