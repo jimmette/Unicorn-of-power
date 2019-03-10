@@ -2,7 +2,7 @@
 
 ## Javascript canvas game
 
-This is the first game I have coded. I wanted it filled with things that bring me joy et make me smile. Being a girly girl, it had to have unicorns and rainbows. Sadly, I could not find the right unicorn image, so, enjoy Rainbowdash instead!
+This is the first game I have coded. I wanted it filled with things that bring me joy and make me smile. Being a girly girl, it had to have unicorns and rainbows. Sadly, I could not find the right unicorn image, so, enjoy Rainbowdash instead!
 
 ### Commands
 
