@@ -4,11 +4,13 @@
 
 ### Commands
 
-###### S - to start
+- S - to start
+- Spacebar - to shoot
+- Arrows to move
 
-###### Spacebar - to shoot
+### How to play
 
-###### Arrows to move
+Get ammo [images/ammo.png] and start shooting :)
 
 ### Play
 
