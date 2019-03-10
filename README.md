@@ -10,7 +10,7 @@
 
 ### How to play
 
-Get ammo [images/ammo.png] and start shooting :)
+Get ammo [./images/ammo.png] and start shooting :)
 
 ### Play
 
